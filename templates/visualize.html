@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Solar Panel Data Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f0f0f0; }
+        .container { max-width: 1200px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { color: #333; font-size: 28px; margin-bottom: 20px; }
+        h2 { color: #444; font-size: 24px; margin-top: 30px; }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-size: 18px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .button:hover { background-color: #45a049; }
+        .stats {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9e9e9;
+            border-radius: 6px;
+            font-size: 18px;
+        }
+        .chart-container { 
+            margin-top: 30px;
+            height: 600px;
+            width: 100%;
+        }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Solar Intensity Over Time</h1>
+        
+        {% if datasets %}
+            <div class="chart-container">
+                <canvas id="intensityChart"></canvas>
+            </div>
+            
+            {% if total_watt_hours %}
+                <div class="stats">
+                    <h2>Total Energy Generated (Watt-hours)</h2>
+                    <ul>
+                    {% for device, watt_hours in total_watt_hours.items() %}
+                        <li>{{ device }}: {{ watt_hours }} Wh</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+            {% else %}
+                <p>No energy data available.</p>
+            {% endif %}
+        {% else %}
+            <p>No data available for visualization.</p>
+        {% endif %}
+        
+        <br>
+        <a href="{{ url_for('upload_file') }}" class="button">Back to Home</a>
+    </div>
+
+    {% if datasets %}
+    <script>
+        const ctx = document.getElementById('intensityChart').getContext('2d');
+        const all_labels = {{ all_labels | tojson }};
+        const datasets = {{ datasets | tojson }};
+        
+        const chartData = {
+            labels: all_labels,
+            datasets: Object.entries(datasets).map(([device, data], index) => ({
+                label: `Solar Intensity for ${device}`,
+                data: data.data,
+                borderColor: `hsl(${index * 137.508}, 75%, 50%)`,
+                backgroundColor: `hsla(${index * 137.508}, 75%, 50%, 0.1)`,
+                fill: false,
+                tension: 0.1
+            }))
+        };
+
+        new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Intensity (W/m²)',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Time',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        ticks: {
+                            font: {
+                                size: 14
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+    {% endif %}
+</body>
+</html>
