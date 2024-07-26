@@ -5,75 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solar Panel Data - Available Dates</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --grey-color: #bdc3c7; /* New grey color for buttons */
+            --background-color: #f4f4f4;
+            --text-color: #333;
+            --card-background: #fff;
+        }
         body { 
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 40px 20px;
         }
         h1 { 
-            color: #2c3e50;
+            color: var(--primary-color);
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
         }
         ul { 
             list-style-type: none;
             padding: 0;
         }
         li { 
-            background-color: #fff;
-            margin-bottom: 15px;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: var(--card-background);
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
         }
         li:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            transform: translateY(-3px);
         }
         .date-link {
-            font-size: 18px;
-            color: #3498db;
+            font-size: 20px;
+            color: var(--primary-color);
             text-decoration: none;
             font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
         }
         .date-link:hover {
             text-decoration: underline;
         }
         .btn-group {
-            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
         }
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             padding: 8px 15px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
-            margin-right: 10px;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn i {
+            margin-right: 5px;
         }
         .delete-btn {
-            background-color: #e74c3c;
+            background-color: var(--grey-color); /* Changed to grey */
             color: white;
         }
         .delete-btn:hover {
-            background-color: #c0392b;
+            background-color: #95a5a6; /* Slightly darker grey on hover */
         }
         .upload-btn {
-            background-color: #2ecc71;
+            background-color: var(--secondary-color);
             color: white;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 20px;
+            display: block;
+            width: fit-content;
+            margin: 30px auto 0;
+            font-size: 16px;
+            padding: 12px 24px;
         }
         .upload-btn:hover {
             background-color: #27ae60;
@@ -82,25 +106,47 @@
             text-align: center;
             font-style: italic;
             color: #7f8c8d;
+            font-size: 18px;
+            margin-top: 40px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 10px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Solar Panel Data</h1>
+        <h1><i class="fas fa-solar-panel"></i> Solar Panel Data</h1>
         {% if dates %}
             <ul>
                 {% for date in dates %}
                     <li>
-                        <a href="{{ url_for('visualize_date', date=date) }}" class="date-link">{{ date }}</a>
+                        <a href="{{ url_for('visualize_date', date=date) }}" class="date-link">
+                            <i class="far fa-calendar-alt"></i> {{ date }}
+                        </a>
                         <div class="btn-group">
-                            <form action="{{ url_for('delete_data_route', date=date) }}" method="post" style="display:inline;">
-                                <button type="submit" class="btn delete-btn">Delete All</button>
+                            <form action="{{ url_for('delete_data_route', date=date) }}" method="post">
+                                <button type="submit" class="btn delete-btn">
+                                    <i class="fas fa-trash-alt"></i> Delete All
+                                </button>
                             </form>
                             {% for device in date_devices[date] %}
-                                <form action="{{ url_for('delete_data_route', date=date) }}" method="post" style="display:inline;">
+                                <form action="{{ url_for('delete_data_route', date=date) }}" method="post">
                                     <input type="hidden" name="device_name" value="{{ device }}">
-                                    <button type="submit" class="btn delete-btn">Delete {{ device }}</button>
+                                    <button type="submit" class="btn delete-btn">
+                                        <i class="fas fa-trash-alt"></i> Delete {{ device }}
+                                    </button>
                                 </form>
                             {% endfor %}
                         </div>
@@ -108,9 +154,39 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <p class="no-data">No dates available. Please upload some data first.</p>
+            <p class="no-data"><i class="fas fa-exclamation-circle"></i> No dates available. Please upload some data first.</p>
         {% endif %}
-        <a href="{{ url_for('upload_file') }}" class="btn upload-btn">Upload New Data</a>
+        <a href="{{ url_for('upload_file') }}" class="btn upload-btn">
+            <i class="fas fa-upload"></i> Upload New Data
+        </a>
     </div>
+    <script>
+        // Add smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Add fade-in animation for list items
+        const listItems = document.querySelectorAll('li');
+        listItems.forEach((item, index) => {
+            item.style.opacity = '0';
+            item.style.animation = `fadeIn 0.5s ease forwards ${index * 0.1}s`;
+        });
+
+        // Add keyframe animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
 </body>
 </html>
